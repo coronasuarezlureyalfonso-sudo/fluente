@@ -773,6 +773,59 @@
     /* ── CONTEO DE RESULTADOS ── */
     .list-count { padding: 6px 14px 4px; font-size: 11px; color: var(--muted); font-weight: 500; border-bottom: 0.5px solid var(--border); }
 
+    /* ── BOTÓN + INLINE EN LIST PANEL ── */
+    .btn-add-inline {
+      display: flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 8px; flex-shrink: 0;
+      background: var(--accent); color: white; border: none;
+      cursor: pointer; transition: background 0.15s, transform 0.1s;
+      box-shadow: 0 1px 4px rgba(42,125,95,0.35);
+    }
+    .btn-add-inline:hover { background: var(--accent-mid); transform: scale(1.07); }
+    .btn-add-inline svg { width: 14px; height: 14px; }
+
+    /* ── SEPARADOR DE SECCIÓN EN LISTA ── */
+    .list-section-divider {
+      padding: 8px 14px 5px;
+      font-size: 10px; font-weight: 700; color: var(--muted);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      background: var(--input-bg);
+      border-bottom: 0.5px solid var(--border);
+      border-top: 0.5px solid var(--border);
+      display: flex; align-items: center; gap: 7px;
+    }
+    .list-section-divider-line { flex: 1; height: 0.5px; background: var(--border); }
+
+    /* ── ITEM RESUELTO — atenuado ── */
+    .list-item-resolved {
+      opacity: 0.45;
+    }
+    .list-item-resolved:hover { opacity: 0.75; }
+    .list-item-resolved.selected { opacity: 1; }
+
+    /* ── FILTRO ACTIVO BADGE MEJORADO ── */
+    .filtros-activos-row {
+      display: flex; flex-wrap: wrap; gap: 4px;
+      padding: 6px 14px 8px;
+      border-bottom: 0.5px solid var(--border);
+      background: var(--selected);
+    }
+
+    /* ── PÓLIZAS: filtro de aseguradora dinámico ── */
+    #fd-p-aseg .fd-opt, #fd-p-socio .fd-opt { white-space: nowrap; }
+
+    /* ── TRÁMITES: filtro de tipo ── */
+    #fd-t-tipo .fd-opt { white-space: nowrap; }
+
+    /* ── RESULTADO COUNT EN LISTA HEADER ── */
+    .list-result-count {
+      font-size: 11px; color: var(--muted); font-weight: 500;
+      padding: 5px 14px 3px;
+      border-bottom: 0.5px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .list-result-count strong { color: var(--text); font-weight: 700; }
+
     .list-filter-row { display: flex; gap: 5px; flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -ms-overflow-style: none; padding-bottom: 2px; }
     .list-filter-row::-webkit-scrollbar { display: none; }
     .filter-chip { padding: 4px 11px; border-radius: 20px; border: 0.5px solid var(--border); font-size: 11px; font-weight: 500; cursor: pointer; background: var(--surface); color: var(--muted); font-family: inherit; transition: all 0.12s; white-space: nowrap; }
@@ -1339,6 +1392,9 @@
               <button class="sort-btn active" id="sort-az" onclick="setSortC('az',this)">A–Z</button>
               <button class="sort-btn" id="sort-za" onclick="setSortC('za',this)">Z–A</button>
             </div>
+            <button class="btn-add-inline" onclick="showPage('clientes',document.querySelectorAll('.tab')[1]);mostrarFormNuevo()" title="Nuevo cliente">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
             <div style="position:relative">
               <button class="btn-filtrar" id="btn-filtro-c" onclick="toggleFiltroDropdown()">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="12" height="12"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
@@ -1381,6 +1437,7 @@
           </div>
           <div id="filtros-activos-c" style="display:none;flex-wrap:wrap;gap:4px"></div>
         </div>
+        <div class="list-result-count" id="count-clientes" style="display:none"></div>
         <div class="list-items" id="list-clientes"></div>
       </div>
       <div class="detail-panel" id="detail-clientes">
@@ -1403,6 +1460,9 @@
               <svg class="search-input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input placeholder="Buscar póliza, cliente..." oninput="filtrarP(this.value)" id="search-p" />
             </div>
+            <button class="btn-add-inline" onclick="showPage('polizas',document.querySelectorAll('.tab')[2]);mostrarFormNuevo()" title="Nueva póliza">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
             <div style="position:relative">
               <button class="btn-filtrar" id="btn-filtro-p" onclick="toggleFiltroPDropdown()">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="12" height="12"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
@@ -1437,6 +1497,18 @@
                     <button class="fd-opt" data-group="pramo" data-val="Daños" onclick="setFiltroPDrop('pramo','Daños',this)">Daños</button>
                   </div>
                 </div>
+                <div class="fd-section-wrap">
+                  <div class="fd-section">Aseguradora</div>
+                  <div class="fd-scroll" id="fd-p-aseg">
+                    <button class="fd-opt active" data-group="paseg" data-val="todas" onclick="setFiltroPDrop('paseg','todas',this)">Todas</button>
+                  </div>
+                </div>
+                <div class="fd-section-wrap">
+                  <div class="fd-section">Socio</div>
+                  <div class="fd-scroll" id="fd-p-socio">
+                    <button class="fd-opt active" data-group="psocio" data-val="todos" onclick="setFiltroPDrop('psocio','todos',this)">Todos</button>
+                  </div>
+                </div>
                 <div class="fd-footer">
                   <span class="fd-count-label" id="fd-p-result-count"><span>—</span> pólizas</span>
                   <button class="fd-reset" onclick="resetFiltrosP()">Limpiar</button>
@@ -1445,6 +1517,7 @@
             </div>
           </div>
         </div>
+        <div class="list-result-count" id="count-polizas" style="display:none"></div>
         <div class="list-items" id="list-polizas"></div>
       </div>
       <div class="detail-panel" id="detail-polizas">
@@ -1466,28 +1539,36 @@
               <svg class="search-input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
               <input placeholder="Buscar por tipo, cliente..." oninput="filtrarT(this.value)" id="search-t" />
             </div>
+            <button class="btn-add-inline" onclick="showPage('tramites',document.querySelectorAll('.tab')[3]);mostrarFormNuevo()" title="Nuevo trámite">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            </button>
             <div style="position:relative">
               <button class="btn-filtrar" id="btn-filtro-t" onclick="toggleFiltroTDropdown()">
                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="12" height="12"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
-                Aseg.
+                Filtrar<span id="filtro-t-count" style="display:none" class="btn-filtrar-count">0</span>
               </button>
               <div class="filtro-dropdown" id="filtro-dropdown-t" style="display:none">
                 <div class="fd-section-wrap">
+                  <div class="fd-section">Tipo de trámite</div>
+                  <div class="fd-scroll" id="fd-t-tipo">
+                    <button class="fd-opt active" data-group="ttipo" data-val="todos" onclick="setFiltroTDrop('ttipo','todos',this)">Todos</button>
+                    <button class="fd-opt" data-group="ttipo" data-val="Siniestro" onclick="setFiltroTDrop('ttipo','Siniestro',this)">Siniestro</button>
+                    <button class="fd-opt" data-group="ttipo" data-val="Reembolso" onclick="setFiltroTDrop('ttipo','Reembolso',this)">Reembolso</button>
+                    <button class="fd-opt" data-group="ttipo" data-val="Endoso" onclick="setFiltroTDrop('ttipo','Endoso',this)">Endoso</button>
+                    <button class="fd-opt" data-group="ttipo" data-val="Cambio de agente" onclick="setFiltroTDrop('ttipo','Cambio de agente',this)">Cambio de agente</button>
+                    <button class="fd-opt" data-group="ttipo" data-val="Cancelación" onclick="setFiltroTDrop('ttipo','Cancelación',this)">Cancelación</button>
+                    <button class="fd-opt" data-group="ttipo" data-val="Otro" onclick="setFiltroTDrop('ttipo','Otro',this)">Otro</button>
+                  </div>
+                </div>
+                <div class="fd-section-wrap">
                   <div class="fd-section">Aseguradora</div>
                   <div class="fd-scroll" id="filtros-t">
-                    <button class="fd-opt active" onclick="setFiltroT('todas',this)">Todas</button>
-                    <button class="fd-opt" onclick="setFiltroT('AXA',this)">AXA</button>
-                    <button class="fd-opt" onclick="setFiltroT('Qualitas',this)">Qualitas</button>
-                    <button class="fd-opt" onclick="setFiltroT('SURA',this)">SURA</button>
-                    <button class="fd-opt" onclick="setFiltroT('Chubb',this)">Chubb</button>
-                    <button class="fd-opt" onclick="setFiltroT('HDI',this)">HDI</button>
-                    <button class="fd-opt" onclick="setFiltroT('GNP',this)">GNP</button>
-                    <button class="fd-opt" onclick="setFiltroT('MetLife',this)">MetLife</button>
+                    <button class="fd-opt active" data-group="taseg" data-val="todas" onclick="setFiltroTDrop('taseg','todas',this)">Todas</button>
                   </div>
                 </div>
                 <div class="fd-footer">
-                  <span class="fd-count-label">Filtrar por aseguradora</span>
-                  <button class="fd-reset" onclick="setFiltroT('todas',document.querySelector('#filtros-t .fd-opt'))">Limpiar</button>
+                  <span class="fd-count-label" id="fd-t-result-count"><span>—</span> trámites</span>
+                  <button class="fd-reset" onclick="resetFiltrosT()">Limpiar</button>
                 </div>
               </div>
             </div>
@@ -1497,8 +1578,10 @@
             <button class="filter-chip" id="ft-pendiente" onclick="setFiltroTEstatus('Pendiente',this)">Pendiente</button>
             <button class="filter-chip" id="ft-proceso" onclick="setFiltroTEstatus('En proceso',this)">En proceso</button>
             <button class="filter-chip" id="ft-docs" onclick="setFiltroTEstatus('En espera de documentos',this)">Docs.</button>
+            <button class="filter-chip" id="ft-resuelto" onclick="setFiltroTEstatus('Resuelto',this)">Resuelto</button>
           </div>
         </div>
+        <div class="list-result-count" id="count-tramites" style="display:none"></div>
         <div class="list-items" id="list-tramites"></div>
       </div>
       <div class="detail-panel" id="detail-tramites">
@@ -1507,6 +1590,86 @@
           <div class="empty-title">Ningún trámite seleccionado</div>
           <div class="empty-sub">Elige uno de la lista o crea uno nuevo</div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RENOVACIONES -->
+  <div class="page" id="page-renovaciones">
+    <div class="renov-container">
+      <div class="renov-topbar">
+        <div class="renov-topbar-row1">
+          <div class="renov-title">Renovaciones</div>
+          <div class="renov-progress-wrap">
+            <div class="renov-progress-inline">
+              <div class="renov-progress-bar-w">
+                <div class="renov-progress-bar">
+                  <div class="renov-progress-fill" id="renov-progress-fill" style="width:0%"></div>
+                </div>
+                <div class="renov-progress-pct" id="renov-progress-pct">0%</div>
+              </div>
+            </div>
+            <div class="renov-progress-nums">
+              <div class="renov-progress-big" id="renov-progress-big"><span>0</span> / 0</div>
+              <div class="renov-progress-label">Notificadas</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button class="btn-export" onclick="exportarRenovCSV()">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              CSV
+            </button>
+            <button class="btn-export" onclick="exportarRenovPDF()">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              PDF
+            </button>
+          </div>
+        </div>
+        <div class="renov-topbar-row2">
+          <input class="renov-search" id="renov-search" placeholder="Buscar cliente, póliza..." oninput="renderRenovaciones()" />
+          <select class="renov-select" id="renov-filtro-dias" onchange="renderRenovaciones()">
+            <option value="7">7 días</option>
+            <option value="14">14 días</option>
+            <option value="30">30 días</option>
+            <option value="60" selected>60 días</option>
+            <option value="90">90 días</option>
+          </select>
+          <select class="renov-select" id="renov-filtro-socio" onchange="renderRenovaciones()">
+            <option value="todos">Todos los socios</option>
+          </select>
+          <select class="renov-select" id="renov-filtro-aseg" onchange="renderRenovaciones()">
+            <option value="todas">Todas las aseguradoras</option>
+            <option value="AXA">AXA</option>
+            <option value="Qualitas">Qualitas</option>
+            <option value="SURA">SURA</option>
+            <option value="Chubb">Chubb</option>
+            <option value="HDI">HDI</option>
+            <option value="GNP">GNP</option>
+            <option value="MetLife">MetLife</option>
+            <option value="Plan Seguro">Plan Seguro</option>
+          </select>
+          <select class="renov-select" id="renov-filtro-estatus" onchange="renderRenovaciones()">
+            <option value="todos">Todos</option>
+            <option value="pendientes">Pendientes</option>
+            <option value="enviadas">Notificadas</option>
+          </select>
+          <span class="renov-sub" id="renov-sub"></span>
+        </div>
+      </div>
+      <div class="renov-table-wrap">
+        <table class="renov-table">
+          <thead>
+            <tr>
+              <th class="th-sort" id="th-dias" onclick="sortRenov('dias')">Días <span class="sort-icon">↑</span></th>
+              <th class="th-sort" id="th-fecha" onclick="sortRenov('fecha')">Vence <span class="sort-icon"></span></th>
+              <th class="th-sort" id="th-cliente" onclick="sortRenov('cliente')">Cliente <span class="sort-icon"></span></th>
+              <th class="th-sort" id="th-tipo" onclick="sortRenov('tipo')">Tipo <span class="sort-icon"></span></th>
+              <th>Socio</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="renov-list"></tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -1682,9 +1845,9 @@
   const GRACIA_DEFAULT = 30
 
   let clientes=[], polizas=[], tramites=[], polPorCliente={}
-  let filtroEstatus='todas', filtroPago='todos', filtroSocioC='todos', filtroAsegT='todas', filtroEstatusT='todas', sortC='az'
+  let filtroEstatus='todas', filtroPago='todos', filtroSocioC='todos', filtroAsegT='todas', filtroEstatusT='todas', filtroTipoT='todos', sortC='az'
   let filtroDropSocio='todos', filtroDropEstado='todos', filtroDropPago='todos'
-  let filtroDropPEstatus='todas', filtroDropPPago='todos', filtroDropPRamo='todos'
+  let filtroDropPEstatus='todas', filtroDropPPago='todos', filtroDropPRamo='todos', filtroDropPAseg='todas', filtroDropPSocio='todos'
   let filtroD=7, pending=null, paginaActual='dashboard', mensajeDash=null
   let selC=null, selP=null, selT=null
   let searchP='', searchT=''
@@ -1834,9 +1997,6 @@
     if(btn) btn.style.borderColor = activos.length ? 'var(--accent)' : ''
   }
   document.addEventListener('click', e => {
-    const dd = document.getElementById('filtro-dropdown')
-    const btn = document.getElementById('btn-filtro-c')
-    if(dd && btn && !dd.contains(e.target) && !btn.contains(e.target)) dd.style.display='none'
     document.querySelectorAll('.autocomplete-list').forEach(l => {
       if(!l.parentElement.contains(e.target)) l.style.display='none'
     })
@@ -1856,20 +2016,22 @@
     if(group==='pestatus') filtroDropPEstatus=val
     else if(group==='ppago') filtroDropPPago=val
     else if(group==='pramo') filtroDropPRamo=val
+    else if(group==='paseg') filtroDropPAseg=val
+    else if(group==='psocio') filtroDropPSocio=val
     btn.closest('.fd-scroll').querySelectorAll('.fd-opt').forEach(b=>b.classList.remove('active'))
     btn.classList.add('active')
     const f = applyFiltersP(polizas)
     renderListP(f)
     const el = document.getElementById('fd-p-result-count')
     if(el) el.innerHTML = `<span>${f.length}</span> póliza${f.length!==1?'s':''}`
-    const activos = [filtroDropPEstatus!=='todas', filtroDropPPago!=='todos', filtroDropPRamo!=='todos'].filter(Boolean).length
+    const activos = [filtroDropPEstatus!=='todas', filtroDropPPago!=='todos', filtroDropPRamo!=='todos', filtroDropPAseg!=='todas', filtroDropPSocio!=='todos'].filter(Boolean).length
     const cnt = document.getElementById('filtro-p-count')
     if(cnt) { cnt.textContent=activos; cnt.style.display=activos?'inline-flex':'none' }
     const btnF = document.getElementById('btn-filtro-p')
     if(btnF) btnF.style.borderColor = activos ? 'var(--accent)' : ''
   }
   window.resetFiltrosP = function() {
-    filtroDropPEstatus='todas'; filtroDropPPago='todos'; filtroDropPRamo='todos'
+    filtroDropPEstatus='todas'; filtroDropPPago='todos'; filtroDropPRamo='todos'; filtroDropPAseg='todas'; filtroDropPSocio='todos'
     document.querySelectorAll('#filtro-dropdown-p .fd-opt').forEach(b=>{
       b.classList.remove('active')
       if(b.dataset.val==='todas'||b.dataset.val==='todos') b.classList.add('active')
@@ -1911,6 +2073,9 @@
     const ddp = document.getElementById('filtro-dropdown-p')
     const btnp = document.getElementById('btn-filtro-p')
     if(ddp && btnp && !ddp.contains(e.target) && !btnp.contains(e.target)) ddp.style.display='none'
+    const ddc = document.getElementById('filtro-dropdown')
+    const btnc = document.getElementById('btn-filtro-c')
+    if(ddc && btnc && !ddc.contains(e.target) && !btnc.contains(e.target)) ddc.style.display='none'
   })
 
   async function cargar() {
@@ -1939,11 +2104,11 @@
         rcom.data.forEach(c => { COMISIONES_PCT[c.aseguradora] = parseFloat(c.porcentaje) })
       }
 
-      // #4 — Socios dinámicos
+      // #4 — Socios dinámicos + filtros de aseguradoras desde datos reales
       if(rsoc.data && rsoc.data.length) {
         SOCIOS_LIST = rsoc.data
-        actualizarFiltrosSocios()
       }
+      actualizarFiltrosSocios()
       polPorCliente={}; polizas.forEach(p=>{polPorCliente[p.cliente]=(polPorCliente[p.cliente]||0)+1})
 
       const renovUrgentes=polizas.filter(p=>{const d=dias(p.fecha_fin);return d!==null&&d>=0&&d<=7&&!p.contactado})
@@ -1986,6 +2151,32 @@
       fdSocio.innerHTML = '<button class="fd-opt active" data-group="socio" data-val="todos" onclick="setFiltroDropdown(\'socio\',\'todos\',this)">Todos</button>'
       SOCIOS_LIST.forEach(s => {
         fdSocio.innerHTML += `<button class="fd-opt" data-group="socio" data-val="${s.nombre}" onclick="setFiltroDropdown('socio','${s.nombre}',this)">${s.nombre}</button>`
+      })
+    }
+    // Update filtro pólizas socio
+    const fdPSocio = document.getElementById('fd-p-socio')
+    if(fdPSocio && SOCIOS_LIST.length) {
+      fdPSocio.innerHTML = '<button class="fd-opt active" data-group="psocio" data-val="todos" onclick="setFiltroPDrop(\'psocio\',\'todos\',this)">Todos</button>'
+      SOCIOS_LIST.forEach(s => {
+        fdPSocio.innerHTML += `<button class="fd-opt" data-group="psocio" data-val="${s.nombre}" onclick="setFiltroPDrop('psocio','${s.nombre}',this)">${s.nombre}</button>`
+      })
+    }
+    // Update filtro pólizas aseguradora (dinámico desde datos reales)
+    const fdPAseg = document.getElementById('fd-p-aseg')
+    if(fdPAseg) {
+      const asegsEnUso = [...new Set(polizas.map(p=>p.aseguradora).filter(Boolean))].sort()
+      fdPAseg.innerHTML = '<button class="fd-opt active" data-group="paseg" data-val="todas" onclick="setFiltroPDrop(\'paseg\',\'todas\',this)">Todas</button>'
+      asegsEnUso.forEach(a => {
+        fdPAseg.innerHTML += `<button class="fd-opt" data-group="paseg" data-val="${a}" onclick="setFiltroPDrop('paseg','${a}',this)">${a}</button>`
+      })
+    }
+    // Update filtro trámites aseguradora (dinámico)
+    const fdTAseg = document.getElementById('filtros-t')
+    if(fdTAseg) {
+      const asegsT = [...new Set(tramites.map(t=>t.aseguradora).filter(Boolean))].sort()
+      fdTAseg.innerHTML = '<button class="fd-opt active" data-group="taseg" data-val="todas" onclick="setFiltroTDrop(\'taseg\',\'todas\',this)">Todas</button>'
+      asegsT.forEach(a => {
+        fdTAseg.innerHTML += `<button class="fd-opt" data-group="taseg" data-val="${a}" onclick="setFiltroTDrop('taseg','${a}',this)">${a}</button>`
       })
     }
     // Update filtro renovaciones socio
@@ -2066,7 +2257,7 @@
         </div>
         <div style="display:flex;gap:5px;margin-bottom:20px;align-items:center">
           <span style="font-size:11px;color:rgba(255,255,255,0.35);font-weight:500;margin-right:4px">Período</span>
-          ${[7,14,30,60].map(d=>`<button onclick="window.setFiltroD(${d})" class="filtro-btn${filtroD===d?' active':''}\">${d} días</button>`).join('')}
+          ${[7,14,30,60].map(function(d){return '<button onclick="window.setFiltroD('+d+')" class="filtro-btn'+(filtroD===d?' active':'')+'">'+ d +' días</button>'}).join('')}
         </div>
         <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">
           <div onclick="irPolizas('por_vencer')" style="background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.1);border-top-color:rgba(255,255,255,0.2);border-radius:11px;padding:18px 20px;cursor:pointer;position:relative;overflow:hidden">
@@ -2247,6 +2438,8 @@
     if(filtroDropPPago==='pagadas') r=r.filter(p=>p.pagada)
     else if(filtroDropPPago==='pendientes') r=r.filter(p=>!p.pagada)
     if(filtroDropPRamo!=='todos') r=r.filter(p=>p.ramo===filtroDropPRamo)
+    if(filtroDropPAseg!=='todas') r=r.filter(p=>p.aseguradora===filtroDropPAseg)
+    if(filtroDropPSocio!=='todos') r=r.filter(p=>(p.socio||'Propio')===filtroDropPSocio)
     return r
   }
 
@@ -2255,6 +2448,14 @@
     if(searchT) r=r.filter(t=>(t.tipo+t.cliente+t.aseguradora+(t.descripcion||'')).toLowerCase().includes(searchT.toLowerCase()))
     if(filtroAsegT!=='todas') r=r.filter(t=>t.aseguradora===filtroAsegT)
     if(filtroEstatusT!=='todas') r=r.filter(t=>t.estatus===filtroEstatusT)
+    if(filtroTipoT!=='todos') r=r.filter(t=>t.tipo===filtroTipoT)
+    // Resueltos siempre al fondo
+    r.sort((a,b)=>{
+      const aR = a.estatus==='Resuelto' ? 1 : 0
+      const bR = b.estatus==='Resuelto' ? 1 : 0
+      if(aR !== bR) return aR - bR
+      return new Date(b.created_at) - new Date(a.created_at)
+    })
     return r
   }
 
@@ -2263,6 +2464,16 @@
   }
   function renderListC(lista) {
     const el=document.getElementById('list-clientes')
+    const countEl=document.getElementById('count-clientes')
+    if(countEl) {
+      const total = clientes.length
+      if(lista.length !== total || filtroDropSocio!=='todos' || filtroDropEstado!=='todos' || filtroDropPago!=='todos') {
+        countEl.style.display='block'
+        countEl.innerHTML = `<strong>${lista.length}</strong> de ${total} clientes`
+      } else {
+        countEl.style.display='none'
+      }
+    }
     if(!lista.length){el.innerHTML=`<div class="list-empty-state">
       <div class="empty-illo"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" width="26" height="26"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg></div>
       <div class="empty-h">Sin clientes aún</div>
@@ -2300,6 +2511,17 @@
 
   function renderListP(lista) {
     const el=document.getElementById('list-polizas')
+    const countEl=document.getElementById('count-polizas')
+    if(countEl) {
+      const total = polizas.length
+      const hasFilter = searchP || filtroDropPEstatus!=='todas' || filtroDropPPago!=='todos' || filtroDropPRamo!=='todos' || filtroDropPAseg!=='todas' || filtroDropPSocio!=='todos'
+      if(hasFilter) {
+        countEl.style.display='block'
+        countEl.innerHTML = `<strong>${lista.length}</strong> de ${total} pólizas`
+      } else {
+        countEl.style.display='none'
+      }
+    }
     if(!lista.length){el.innerHTML=`<div class="list-empty-state">
       <div class="empty-illo"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" width="26" height="26"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
       <div class="empty-h">Sin pólizas registradas</div>
@@ -2324,18 +2546,31 @@
 
   function renderListT(lista) {
     const el=document.getElementById('list-tramites')
+    const countEl=document.getElementById('count-tramites')
+    if(countEl) {
+      const total = tramites.length
+      if(lista.length !== total || filtroAsegT!=='todas' || filtroEstatusT!=='todas' || filtroTipoT!=='todos') {
+        countEl.style.display='block'
+        countEl.innerHTML = `<strong>${lista.length}</strong> de ${total} trámites`
+      } else {
+        countEl.style.display='none'
+      }
+    }
     if(!lista.length){el.innerHTML=`<div class="list-empty-state">
       <div class="empty-illo"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5" width="26" height="26"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg></div>
       <div class="empty-h">Sin trámites activos</div>
       <div class="empty-p">Todo resuelto — o crea un nuevo trámite cuando lo necesites</div>
       <button class="empty-btn" onclick="showPage('tramites',document.querySelectorAll('.tab')[3]);mostrarFormNuevo()">+ Nuevo trámite</button>
     </div>`;return}
-    el.innerHTML=lista.map(t=>{
+    const activos = lista.filter(t=>t.estatus!=='Resuelto')
+    const resueltos = lista.filter(t=>t.estatus==='Resuelto')
+    function itemT(t) {
       const d=Math.ceil((new Date()-new Date(t.created_at))/86400000)
       const bc=t.estatus==='Resuelto'?'ib-green':t.estatus==='En proceso'?'ib-blue':t.estatus==='En espera de documentos'?'ib-amber':'ib-red'
       const bl=t.estatus==='En espera de documentos'?'Docs.':t.estatus==='Resuelto'?'Resuelto':t.estatus==='En proceso'?'En proceso':'Pendiente'
       const diasCls=d>=14?'dias-critico':'dias-normal'
-      return`<div class="list-item ${selT===t.id?'selected':''}" onclick="selTramite(${t.id})">
+      const resClass=t.estatus==='Resuelto'?'list-item-resolved':''
+      return`<div class="list-item ${resClass} ${selT===t.id?'selected':''}" onclick="selTramite(${t.id})">
         <div class="item-av ${avC(t.cliente||'A')}">${ini(t.cliente||'?')}</div>
         <div class="item-body">
           <div class="item-name">${t.tipo||'—'}</div>
@@ -2350,11 +2585,38 @@
           <span class="dias-badge ${diasCls}">${d}d</span>
         </div>
       </div>`
-    }).join('')
+    }
+    let html = activos.map(itemT).join('')
+    if(resueltos.length && filtroEstatusT==='todas') {
+      html += `<div class="list-section-divider">
+        <svg fill="none" viewBox="0 0 16 16" stroke="currentColor" stroke-width="2" width="11" height="11"><polyline points="13 4 6 11 3 8"/></svg>
+        Resueltos (${resueltos.length})
+        <div class="list-section-divider-line"></div>
+      </div>`
+      html += resueltos.map(itemT).join('')
+    } else if(filtroEstatusT!=='todas') {
+      html = lista.map(itemT).join('')
+    }
+    el.innerHTML = html
   }
 
   window.selCliente = function(id){selC=id;renderListC(applyFiltersC(clientes));const c=clientes.find(x=>x.id===id);if(c)showDetailC(c)}
   window.selPoliza = function(id){selP=id;renderListP(applyFiltersP(polizas));const p=polizas.find(x=>x.id===id);if(p)showDetailP(p)}
+
+  window.selPolizaRenov = function(id) {
+    // Highlight active row in renovaciones table
+    document.querySelectorAll('.renov-tr').forEach(function(tr){ tr.classList.remove('active-row') })
+    const row = document.querySelector('.renov-tr[data-poliza-id="'+id+'"]')
+    if(row) row.classList.add('active-row')
+    // Navigate to polizas detail
+    selP = id
+    showPage('polizas', document.querySelectorAll('.tab')[2])
+    setTimeout(function(){
+      renderListP(applyFiltersP(polizas))
+      const p = polizas.find(function(x){ return x.id===id })
+      if(p) showDetailP(p)
+    }, 50)
+  }
   window.selTramite = function(id){selT=id;renderListT(applyFiltersT(tramites));const t=tramites.find(x=>x.id===id);if(t)showDetailT(t)}
 
   function ventaCruzadaHtml(c) {
@@ -2685,6 +2947,33 @@
     if(btn) btn.classList.add('active')
     renderListT(applyFiltersT(tramites))
   }
+  window.setFiltroTDrop = function(group, val, btn) {
+    if(group==='ttipo') filtroTipoT=val
+    else if(group==='taseg') filtroAsegT=val
+    btn.closest('.fd-scroll').querySelectorAll('.fd-opt').forEach(b=>b.classList.remove('active'))
+    btn.classList.add('active')
+    renderListT(applyFiltersT(tramites))
+    const f = applyFiltersT(tramites)
+    const el = document.getElementById('fd-t-result-count')
+    if(el) el.innerHTML = `<span>${f.length}</span> trámite${f.length!==1?'s':''}`
+    const activos = [filtroTipoT!=='todos', filtroAsegT!=='todas'].filter(Boolean).length
+    const cnt = document.getElementById('filtro-t-count')
+    if(cnt) { cnt.textContent=activos; cnt.style.display=activos?'inline-flex':'none' }
+    const btnF = document.getElementById('btn-filtro-t')
+    if(btnF) btnF.style.borderColor = activos ? 'var(--accent)' : ''
+  }
+  window.resetFiltrosT = function() {
+    filtroTipoT='todos'; filtroAsegT='todas'
+    document.querySelectorAll('#filtro-dropdown-t .fd-opt').forEach(b=>{
+      b.classList.remove('active')
+      if(b.dataset.val==='todos'||b.dataset.val==='todas') b.classList.add('active')
+    })
+    renderListT(applyFiltersT(tramites))
+    const cnt = document.getElementById('filtro-t-count')
+    if(cnt) cnt.style.display='none'
+    const btnF = document.getElementById('btn-filtro-t')
+    if(btnF) btnF.style.borderColor = ''
+  }
   window.setFiltroTEstatus = function(v,btn){
     filtroEstatusT=v
     document.querySelectorAll('.filter-chip[id^="ft-"]').forEach(b=>b.classList.remove('active'))
@@ -2694,6 +2983,11 @@
   window.toggleFiltroTDropdown = function(){
     const dd=document.getElementById('filtro-dropdown-t')
     const isOpen=dd.style.display!=='none'
+    if(!isOpen) {
+      const f = applyFiltersT(tramites)
+      const el = document.getElementById('fd-t-result-count')
+      if(el) el.innerHTML = `<span>${f.length}</span> trámite${f.length!==1?'s':''}`
+    }
     dd.style.display=isOpen?'none':'block'
   }
 
