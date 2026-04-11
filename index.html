@@ -4822,11 +4822,24 @@
     }
   }
 
+  // Almacena las cuotas extraídas por IA para guardarlas
+  var _scanCuotas = null
+
   function llenarScanForm(d) {
     var set = function(id, val) {
       var el = document.getElementById(id)
       if(el && val != null) el.value = val
     }
+
+    // Tipo cuotas — mostrar resumen en lugar del form completo
+    if(d.tipo === 'cuotas' && Array.isArray(d.cuotas) && d.cuotas.length > 0) {
+      _scanCuotas = d
+      mostrarResumenCuotas(d)
+      return
+    }
+
+    // Tipo caratula — form normal
+    _scanCuotas = null
     set('sr-cliente',    d.cliente)
     set('sr-numero',     d.numero_poliza)
     set('sr-aseg',       d.aseguradora)
@@ -4850,8 +4863,61 @@
       var fEl = document.getElementById('sr-frecuencia')
       if(fEl) fEl.value = d.frecuencia_pago
     }
-    // Fecha primer pago = fecha_inicio si existe
     if(d.fecha_inicio) set('sr-fecha-pago', d.fecha_inicio)
+  }
+
+  function mostrarResumenCuotas(d) {
+    var resultsEl = document.getElementById('scan-results')
+    if(!resultsEl) return
+
+    var totalGeneral = d.cuotas.reduce(function(s,c){ return s+(c.total||0) }, 0)
+    var primeraCuota = d.cuotas[0]
+    var cuotaSubsec  = d.cuotas.length > 1 ? d.cuotas[1] : null
+
+    var html = '<div style="margin-bottom:14px">'
+      + '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">Datos generales</div>'
+      + '<div class="scan-result-grid" style="margin-bottom:12px">'
+      + '<div class="scan-field full"><label>Cliente</label><input id="sr-cliente" value="'+(d.cliente||'')+'" /></div>'
+      + '<div class="scan-field"><label>Núm. Póliza</label><input id="sr-numero" value="'+(d.numero_poliza||'')+'" /></div>'
+      + '<div class="scan-field"><label>Aseguradora</label><input id="sr-aseg" value="'+(d.aseguradora||'')+'" /></div>'
+      + '<div class="scan-field"><label>Días de gracia</label><input id="sr-dias-gracia" type="number" value="'+(d.dias_gracia||30)+'" /></div>'
+      + '<div class="scan-field"><label>Moneda</label><select id="sr-moneda"><option value="MXN">MXN</option><option value="USD">USD</option></select></div>'
+      + '</div></div>'
+
+    html += '<div style="height:0.5px;background:var(--border);margin:8px 0 14px"></div>'
+    html += '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px">'
+      + d.cuotas.length + ' cuotas detectadas — total $'+totalGeneral.toLocaleString('es-MX',{minimumFractionDigits:2})+'</div>'
+
+    // Tabla resumen de cuotas
+    html += '<div style="border:0.5px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px">'
+    html += '<div style="display:grid;grid-template-columns:40px 1fr 90px 90px 90px 90px;gap:0;background:var(--input-bg);padding:8px 12px;font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em">'
+    html += '<div>#</div><div>Fecha pago</div><div style="text-align:right">Prima neta</div><div style="text-align:right">Financ.</div><div style="text-align:right">IVA</div><div style="text-align:right">Total</div></div>'
+
+    d.cuotas.forEach(function(c, idx) {
+      var bg = idx % 2 === 0 ? 'var(--surface)' : 'var(--sidebar-bg)'
+      var fechaStr = c.fecha_pago || '—'
+      html += '<div style="display:grid;grid-template-columns:40px 1fr 90px 90px 90px 90px;gap:0;background:'+bg+';padding:9px 12px;font-size:12px;border-top:0.5px solid var(--border)">'
+      html += '<div style="font-weight:700;color:var(--muted)">'+c.num+'</div>'
+      html += '<div style="color:var(--text)">'+ fechaStr +'</div>'
+      html += '<div style="text-align:right;color:var(--text)">$'+(c.prima_neta||0).toLocaleString('es-MX',{minimumFractionDigits:2})+'</div>'
+      html += '<div style="text-align:right;color:var(--muted)">$'+(c.financiamiento||0).toLocaleString('es-MX',{minimumFractionDigits:2})+'</div>'
+      html += '<div style="text-align:right;color:var(--muted)">$'+(c.impuestos||0).toLocaleString('es-MX',{minimumFractionDigits:2})+'</div>'
+      html += '<div style="text-align:right;font-weight:700;color:var(--accent)">$'+(c.total||0).toLocaleString('es-MX',{minimumFractionDigits:2})+'</div>'
+      html += '</div>'
+    })
+    html += '</div>'
+
+    // Totales
+    var totalPrimaNeta = d.cuotas.reduce(function(s,c){ return s+(c.prima_neta||0) }, 0)
+    var totalIVA       = d.cuotas.reduce(function(s,c){ return s+(c.impuestos||0) }, 0)
+    html += '<div style="display:flex;justify-content:space-between;padding:10px 12px;background:var(--selected);border-radius:8px;font-size:12px">'
+    html += '<span style="color:var(--muted)">Prima neta total: <strong style="color:var(--text)">$'+totalPrimaNeta.toLocaleString('es-MX',{minimumFractionDigits:2})+'</strong></span>'
+    html += '<span style="color:var(--muted)">IVA total: <strong style="color:var(--text)">$'+totalIVA.toLocaleString('es-MX',{minimumFractionDigits:2})+'</strong></span>'
+    html += '<span style="color:var(--accent);font-weight:700">TOTAL: $'+totalGeneral.toLocaleString('es-MX',{minimumFractionDigits:2})+'</span>'
+    html += '</div>'
+
+    resultsEl.innerHTML = html
+    resultsEl.style.display = 'block'
   }
 
   window.recalcScanTotal = function() {
@@ -4881,6 +4947,73 @@
     var btn = document.getElementById('scan-save-btn')
     if(btn) { btn.disabled = true; btn.textContent = 'Guardando...' }
 
+    var { data: { user } } = await sb.auth.getUser()
+
+    // Si hay cuotas detectadas por IA, guardar una por una
+    if(_scanCuotas && _scanCuotas.tipo === 'cuotas' && Array.isArray(_scanCuotas.cuotas)) {
+      var get = function(id) { return document.getElementById(id)?.value?.trim() || null }
+      var diasGracia  = parseInt(document.getElementById('sr-dias-gracia')?.value) || 30
+      var clienteVal  = get('sr-cliente') || _scanCuotas.cliente || 'Sin nombre'
+      var asegVal     = get('sr-aseg')    || _scanCuotas.aseguradora
+      var numPolVal   = get('sr-numero')  || _scanCuotas.numero_poliza
+      var ramoVal     = _scanCuotas.ramo  || 'Auto'
+      var monedaVal   = document.getElementById('sr-moneda')?.value || 'MXN'
+      var numTotal    = _scanCuotas.cuotas.length
+
+      var payloads = _scanCuotas.cuotas.map(function(c) {
+        var fechaLimite = null
+        if(c.fecha_limite) {
+          fechaLimite = c.fecha_limite
+        } else if(c.fecha_pago) {
+          var dl = new Date(c.fecha_pago + 'T00:00:00')
+          dl.setDate(dl.getDate() + diasGracia)
+          fechaLimite = dl.toISOString().slice(0,10)
+        }
+        // derechos = gastos_expedicion en avisos de cobro Chubb
+        var derechos = c.gastos_expedicion || 0
+        var primaTotal = (c.prima_neta||0) + (c.financiamiento||0) + derechos + (c.impuestos||0)
+        return {
+          user_id:            user.id,
+          cliente:            clienteVal,
+          aseguradora:        asegVal,
+          numero_poliza:      numPolVal,
+          ramo:               ramoVal,
+          prima_neta:         c.prima_neta      || 0,
+          derechos:           derechos,
+          impuestos:          c.impuestos       || 0,
+          prima_total:        c.total           || primaTotal,
+          financiado:         true,
+          num_pagos:          numTotal,
+          pago_inicial:       _scanCuotas.cuotas[0]?.total || 0,
+          pago_subsecuente:   numTotal > 1 ? (_scanCuotas.cuotas[1]?.total || 0) : 0,
+          frecuencia_pago:    'mensual',
+          fecha_primer_pago:  _scanCuotas.cuotas[0]?.fecha_pago,
+          fecha_proximo_pago: c.fecha_pago,
+          fecha_limite_pago:  fechaLimite,
+          dias_gracia:        diasGracia,
+          pago_num_actual:    c.num,
+          pago_num_total:     numTotal,
+          estatus:            'pendiente',
+          origen:             'scan_ia',
+          notas:              'Cuota ' + c.num + ' de ' + numTotal + ' — Financiamiento: $' + (c.financiamiento||0).toFixed(2)
+        }
+      })
+
+      // Insertar todas las cuotas
+      var { data: inserted, error } = await sb.from('cobranza').insert(payloads).select()
+      if(error) {
+        if(btn) { btn.disabled=false; btn.textContent='Guardar en Cobranza' }
+        showScanError('Error al guardar: ' + error.message)
+        return
+      }
+      if(inserted) inserted.forEach(function(r){ cobranzaData.push(r) })
+      cerrarScanModal()
+      showToast(numTotal + ' cuotas guardadas en Cobranza ✓')
+      if(document.getElementById('page-cobranza').classList.contains('active')) renderCobranza()
+      return
+    }
+
+    // Flujo normal — caratula sin cuotas
     var get = function(id) { return document.getElementById(id)?.value?.trim() || null }
     var getNum = function(id) { var v=parseFloat(get(id)); return isNaN(v)?null:v }
 
@@ -4888,19 +5021,16 @@
     var derechos   = getNum('sr-derechos')
     var impuestos  = getNum('sr-impuestos')
     var primaTotal = getNum('sr-prima-total') || (primaNeta||0)+(derechos||0)+(impuestos||0)
-
     var fechaPago  = get('sr-fecha-pago')
     var diasGracia = parseInt(get('sr-dias-gracia')) || 30
     var fechaLimite = null
     if(fechaPago) {
-      var d = new Date(fechaPago + 'T00:00:00')
-      d.setDate(d.getDate() + diasGracia)
-      fechaLimite = d.toISOString().slice(0,10)
+      var dl = new Date(fechaPago + 'T00:00:00')
+      dl.setDate(dl.getDate() + diasGracia)
+      fechaLimite = dl.toISOString().slice(0,10)
     }
-
     var financiado = document.getElementById('sr-financiado')?.value === 'si'
 
-    var { data: { user } } = await sb.auth.getUser()
     var payload = {
       user_id:            user.id,
       cliente:            get('sr-cliente') || 'Sin nombre',
