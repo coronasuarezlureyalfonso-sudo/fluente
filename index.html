@@ -1386,6 +1386,7 @@
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 </head>
 <body>
 
@@ -4724,36 +4725,59 @@
     var maxSize = 10 * 1024 * 1024
     if(file.size > maxSize) { showScanError('El archivo supera 10 MB'); return }
 
-    var reader = new FileReader()
-    reader.onload = function(ev) {
-      var dataUrl = ev.target.result
-      var parts   = dataUrl.split(',')
-      _scanFileBase64 = parts[1]
-      _scanMediaType  = file.type === 'application/pdf' ? 'image/jpeg' : file.type
+    document.getElementById('scan-dropzone').style.display = 'none'
+    document.getElementById('scan-error').classList.remove('visible')
 
-      // Mostrar preview (para PDF mostramos ícono, para imagen mostramos preview)
-      document.getElementById('scan-dropzone').style.display = 'none'
-      var prevImg = document.getElementById('scan-preview-img')
-      if(file.type.startsWith('image/')) {
-        prevImg.src = dataUrl
-        document.getElementById('scan-preview').classList.add('visible')
-      } else {
-        // PDF — convertir primera página a imagen via canvas no es trivial en browser
-        // Mostrar placeholder con nombre del archivo
-        prevImg.src = ''
-        prevImg.style.display = 'none'
-        document.getElementById('scan-preview').classList.add('visible')
-      }
-      // Auto-arrancar escaneo
-      ejecutarScanIA()
-    }
-
-    // Para PDFs necesitamos enviar como base64 directo
     if(file.type === 'application/pdf') {
-      _scanMediaType = 'application/pdf'
-      reader.readAsDataURL(file)
+      // Convertir PDF a imagen usando PDF.js
+      _scanMediaType = 'image/jpeg'
+      var reader = new FileReader()
+      reader.onload = function(ev) {
+        var pdfData = new Uint8Array(ev.target.result)
+        // Configurar worker de PDF.js desde CDN
+        if(typeof pdfjsLib !== 'undefined') {
+          pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+          pdfjsLib.getDocument({ data: pdfData }).promise.then(function(pdf) {
+            return pdf.getPage(1)
+          }).then(function(page) {
+            var scale = 2.0
+            var viewport = page.getViewport({ scale: scale })
+            var canvas = document.createElement('canvas')
+            canvas.width  = viewport.width
+            canvas.height = viewport.height
+            var ctx = canvas.getContext('2d')
+            return page.render({ canvasContext: ctx, viewport: viewport }).promise.then(function() {
+              return canvas.toDataURL('image/jpeg', 0.92)
+            })
+          }).then(function(dataUrl) {
+            _scanFileBase64 = dataUrl.split(',')[1]
+            var prevImg = document.getElementById('scan-preview-img')
+            prevImg.src = dataUrl
+            prevImg.style.display = 'block'
+            document.getElementById('scan-preview').classList.add('visible')
+            ejecutarScanIA()
+          }).catch(function(err) {
+            showScanError('Error al leer el PDF: ' + err.message)
+          })
+        } else {
+          showScanError('PDF.js no disponible. Intenta subir una imagen JPG en su lugar.')
+        }
+      }
+      reader.readAsArrayBuffer(file)
     } else {
-      reader.readAsDataURL(file)
+      // Imagen directa
+      _scanMediaType = file.type
+      var reader2 = new FileReader()
+      reader2.onload = function(ev) {
+        var dataUrl = ev.target.result
+        _scanFileBase64 = dataUrl.split(',')[1]
+        var prevImg = document.getElementById('scan-preview-img')
+        prevImg.src = dataUrl
+        prevImg.style.display = 'block'
+        document.getElementById('scan-preview').classList.add('visible')
+        ejecutarScanIA()
+      }
+      reader2.readAsDataURL(file)
     }
   }
 
@@ -4936,5 +4960,3 @@
 </script>
 </body>
 </html>
-
-
